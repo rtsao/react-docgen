@@ -24,6 +24,10 @@ function ignore() {
   return false;
 }
 
+function isRootFunction(path) {
+  return path.parent && path.parent.node && path.parent.node.type === 'Program';
+}
+
 function isComponentDefinition(path) {
   return isReactCreateClassCall(path) || isReactComponentClass(path) || isStatelessComponent(path);
 }
@@ -81,6 +85,35 @@ export default function findExportedComponentDefinition(
     return false;
   }
 
+  function checkIfComponentWrapper(path) {
+    if (!types.FunctionDeclaration.check(path.node) || !isRootFunction(path)) {
+      return false;
+    }
+    var returnVal = path
+      .get('body', 'body')
+      .filter(p => types.ReturnStatement.check(p.value))
+      .map(p => p.get('argument'))[0];
+    return resolveToValue(returnVal);
+  }
+
+  function resolveAndSetDefinition(path) {
+    var possibleWrapper = checkIfComponentWrapper(path);
+
+    if (possibleWrapper) {
+      path = possibleWrapper;
+    }
+
+    if (!isComponentDefinition(path)) {
+      return false;
+    }
+    if (definition) {
+      // If a file exports multiple components, ... complain!
+      throw new Error(ERROR_MULTIPLE_DEFINITIONS);
+    }
+    definition = resolveDefinition(path, types);
+    return false;
+  }
+
   recast.visit(ast, {
     visitFunctionDeclaration: ignore,
     visitFunctionExpression: ignore,
@@ -94,29 +127,20 @@ export default function findExportedComponentDefinition(
     visitDoWhileStatement: ignore,
     visitForStatement: ignore,
     visitForInStatement: ignore,
-
     visitExportDeclaration: exportDeclaration,
     visitExportNamedDeclaration: exportDeclaration,
     visitExportDefaultDeclaration: exportDeclaration,
-
     visitAssignmentExpression: function(path) {
       // Ignore anything that is not `exports.X = ...;` or
       // `module.exports = ...;`
       if (!isExportsOrModuleAssignment(path)) {
         return false;
       }
+
       // Resolve the value of the right hand side. It should resolve to a call
       // expression, something like React.createClass
       path = resolveToValue(path.get('right'));
-      if (!isComponentDefinition(path)) {
-        return false;
-      }
-      if (definition) {
-        // If a file exports multiple components, ... complain!
-        throw new Error(ERROR_MULTIPLE_DEFINITIONS);
-      }
-      definition = resolveDefinition(path, types);
-      return false;
+      return resolveAndSetDefinition(path);
     },
   });
 

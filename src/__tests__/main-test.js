@@ -82,6 +82,41 @@ describe('main', () => {
     `);
   });
 
+  describe('React.createClass in wrapper', () => {
+    test(`
+      var React = require("React");
+      var PropTypes = React.PropTypes;
+
+      function wrapper() {
+        var defaultProps = {
+          foo: true,
+        };
+        var propTypes =  {
+          /**
+           * Example prop description
+           */
+          foo: PropTypes.bool
+        };
+
+        /**
+         * Example component description
+         */
+        var Component = React.createClass({
+          displayName: 'ABC',
+          propTypes,
+          getDefaultProps: function() {
+            return defaultProps;
+          }
+        });
+
+        return Component;
+      }
+
+      module.exports = wrapper();
+      module.exports.customize = wrapper;
+    `);
+  });
+
   describe('Class definition', () => {
     test(`
       const React = require("React");
