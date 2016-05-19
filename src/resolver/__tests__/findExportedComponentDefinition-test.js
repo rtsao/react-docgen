@@ -45,6 +45,17 @@ describe('findExportedComponentDefinition', () => {
         expect(parse(source)).toBeDefined();
       });
 
+      it('finds React.createClass', () => {
+        var source = `
+          var React = require("React");
+          var hoc = require("hoc");
+          var Component = React.createClass({});
+          module.exports = hoc(Component);
+        `;
+
+        expect(parse(source)).toBeDefined();
+      });
+
       it('finds React.createClass, independent of the var name', () => {
         var source = `
           var R = require("React");

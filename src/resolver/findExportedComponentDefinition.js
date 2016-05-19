@@ -16,6 +16,10 @@ import isStatelessComponent from '../utils/isStatelessComponent';
 import normalizeClassDefinition from '../utils/normalizeClassDefinition';
 import resolveExportDeclaration from '../utils/resolveExportDeclaration';
 import resolveToValue from '../utils/resolveToValue';
+import match from '../utils/match';
+import recast from 'recast';
+
+var {types: {namedTypes: types}} = recast;
 
 var ERROR_MULTIPLE_DEFINITIONS =
   'Multiple exported component definitions found.';
@@ -26,6 +30,18 @@ function ignore() {
 
 function isComponentDefinition(path) {
   return isReactCreateClassCall(path) || isReactComponentClass(path) || isStatelessComponent(path);
+}
+
+function isComponentOrHigherOrderComponent(path) {
+  return isComponentDefinition(path) || isHigherOrderComponent(path);
+}
+
+function isHigherOrderComponent(path) {
+  if (types.CallExpression.check(path.node)) {
+    var resolvedPath = resolveToValue(path.get('arguments', 0));
+    return isComponentDefinition(resolvedPath);
+  }
+  return false;
 }
 
 function resolveDefinition(definition, types) {
@@ -108,7 +124,7 @@ export default function findExportedComponentDefinition(
       // Resolve the value of the right hand side. It should resolve to a call
       // expression, something like React.createClass
       path = resolveToValue(path.get('right'));
-      if (!isComponentDefinition(path)) {
+      if (!isComponentOrHigherOrderComponent(path)) {
         return false;
       }
       if (definition) {
