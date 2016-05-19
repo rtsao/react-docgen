@@ -16,6 +16,10 @@ import isStatelessComponent from '../utils/isStatelessComponent';
 import normalizeClassDefinition from '../utils/normalizeClassDefinition';
 import resolveExportDeclaration from '../utils/resolveExportDeclaration';
 import resolveToValue from '../utils/resolveToValue';
+import match from '../utils/match';
+import recast from 'recast';
+
+var {types: {namedTypes: types}} = recast;
 
 var ERROR_MULTIPLE_DEFINITIONS =
   'Multiple exported component definitions found.';
@@ -26,6 +30,29 @@ function ignore() {
 
 function isComponentDefinition(path) {
   return isReactCreateClassCall(path) || isReactComponentClass(path) || isStatelessComponent(path);
+}
+
+function isComponentOrHigherOrderComponent(path) {
+  // Resolve the value of the right hand side. It should resolve to a call
+  // expression, something like React.createClass
+  path = resolveToValue(path.get('right'));
+  if (isComponentDefinition(path)) {
+    return path;
+  }
+  var componentPath = higherOrderComponent(path);
+  if (componentPath) {
+    return componentPath;
+  }
+}
+
+function higherOrderComponent(path) {
+  if (types.CallExpression.check(path.node)) {
+    var resolvedPath = resolveToValue(path.get('arguments', 0));
+    if (isComponentDefinition(resolvedPath)) {
+      return resolvedPath;
+    }
+  }
+  return false;
 }
 
 function resolveDefinition(definition, types) {
@@ -105,17 +132,15 @@ export default function findExportedComponentDefinition(
       if (!isExportsOrModuleAssignment(path)) {
         return false;
       }
-      // Resolve the value of the right hand side. It should resolve to a call
-      // expression, something like React.createClass
-      path = resolveToValue(path.get('right'));
-      if (!isComponentDefinition(path)) {
+      var componentPath = isComponentOrHigherOrderComponent(path);
+      if (!componentPath) {
         return false;
       }
       if (definition) {
         // If a file exports multiple components, ... complain!
         throw new Error(ERROR_MULTIPLE_DEFINITIONS);
       }
-      definition = resolveDefinition(path, types);
+      definition = resolveDefinition(componentPath, types);
       return false;
     },
   });
