@@ -42,7 +42,7 @@ describe('findExportedComponentDefinition', () => {
           module.exports = Component;
         `;
 
-        expect(parse(source)).toBeDefined();
+        expect(parse(source)).toEqual(jasmine.any(Object));
       });
 
       it('finds React.createClass, independent of the var name', () => {
@@ -52,7 +52,7 @@ describe('findExportedComponentDefinition', () => {
           module.exports = Component;
         `;
 
-        expect(parse(source)).toBeDefined();
+        expect(parse(source)).toEqual(jasmine.any(Object));
       });
 
       it('does not process X.createClass of other modules', () => {
@@ -77,7 +77,7 @@ describe('findExportedComponentDefinition', () => {
         `;
 
         var result = parse(source);
-        expect(result).toBeDefined();
+        expect(result).toEqual(jasmine.any(Object));
         expect(result.node.type).toBe('ClassDeclaration');
       });
 
@@ -89,7 +89,7 @@ describe('findExportedComponentDefinition', () => {
         `;
 
         var result = parse(source);
-        expect(result).toBeDefined();
+        expect(result).toEqual(jasmine.any(Object));
         expect(result.node.type).toBe('ClassExpression');
       });
 
@@ -101,7 +101,7 @@ describe('findExportedComponentDefinition', () => {
         `;
 
         var result = parse(source);
-        expect(result).toBeDefined();
+        expect(result).toEqual(jasmine.any(Object));
         expect(result.node.type).toBe('ClassDeclaration');
       });
     });
@@ -115,7 +115,7 @@ describe('findExportedComponentDefinition', () => {
           module.exports = Component;
         `;
 
-        expect(parse(source)).toBeDefined();
+        expect(parse(source)).toEqual(jasmine.any(Object));
       });
 
       it('finds stateless components with React.createElement, independent of the var name', () => {
@@ -125,7 +125,7 @@ describe('findExportedComponentDefinition', () => {
           module.exports = Component;
         `;
 
-        expect(parse(source)).toBeDefined();
+        expect(parse(source)).toEqual(jasmine.any(Object));
       });
 
       it('does not process X.createElement of other modules', () => {
@@ -152,7 +152,7 @@ describe('findExportedComponentDefinition', () => {
             exports.Component = Component;
           `;
 
-          expect(parse(source)).toBeDefined();
+          expect(parse(source)).toEqual(jasmine.any(Object));
         });
 
         it('errors if multiple components are exported', () => {
@@ -175,7 +175,7 @@ describe('findExportedComponentDefinition', () => {
             exports.ComponentB = ComponentB;
           `;
 
-          expect(parse(source)).toBeDefined();
+          expect(parse(source)).toEqual(jasmine.any(Object));
 
           source = `
             var R = require("React");
@@ -184,7 +184,7 @@ describe('findExportedComponentDefinition', () => {
             module.exports = ComponentB;
           `;
 
-          expect(parse(source)).toBeDefined();
+          expect(parse(source)).toEqual(jasmine.any(Object));
         });
 
       });
@@ -199,7 +199,7 @@ describe('findExportedComponentDefinition', () => {
           `;
 
           var result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ClassDeclaration');
         });
 
@@ -224,7 +224,7 @@ describe('findExportedComponentDefinition', () => {
           `;
 
           var result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ClassDeclaration');
 
           source = `
@@ -235,7 +235,7 @@ describe('findExportedComponentDefinition', () => {
           `;
 
           result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ClassDeclaration');
         });
       });
@@ -255,14 +255,14 @@ describe('findExportedComponentDefinition', () => {
             export default Component
           `;
 
-          expect(parse(source)).toBeDefined();
+          expect(parse(source)).toEqual(jasmine.any(Object));
 
           source = `
             var React = require("React");
             export default React.createClass({});
           `;
 
-          expect(parse(source)).toBeDefined();
+          expect(parse(source)).toEqual(jasmine.any(Object));
         });
 
         it('errors if multiple components are exported', () => {
@@ -289,7 +289,7 @@ describe('findExportedComponentDefinition', () => {
             export default React.createClass({});
           `;
 
-          expect(parse(source)).toBeDefined();
+          expect(parse(source)).toEqual(jasmine.any(Object));
         });
 
       });
@@ -304,7 +304,7 @@ describe('findExportedComponentDefinition', () => {
           `;
 
           var result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ClassDeclaration');
 
           source = `
@@ -313,7 +313,7 @@ describe('findExportedComponentDefinition', () => {
           `;
 
           result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ClassDeclaration');
         });
 
@@ -342,7 +342,7 @@ describe('findExportedComponentDefinition', () => {
           `;
 
           var result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ClassDeclaration');
         });
       });
@@ -358,13 +358,13 @@ describe('findExportedComponentDefinition', () => {
             var React = require("React");
             export var somethingElse = 42, Component = React.createClass({});
           `;
-          expect(parse(source)).toBeDefined();
+          expect(parse(source)).toEqual(jasmine.any(Object));
 
           source = `
             var React = require("React");
             export let Component = React.createClass({}), somethingElse = 42;
           `;
-          expect(parse(source)).toBeDefined();
+          expect(parse(source)).toEqual(jasmine.any(Object));
 
           source = `
             var React = require("React");
@@ -372,14 +372,14 @@ describe('findExportedComponentDefinition', () => {
              Component = React.createClass({}),
              somethingElse = 42;
           `;
-          expect(parse(source)).toBeDefined();
+          expect(parse(source)).toEqual(jasmine.any(Object));
 
           source = `
             var React = require("React");
             export var somethingElse = function() {};
             export let Component = React.createClass({});
           `;
-          expect(parse(source)).toBeDefined();
+          expect(parse(source)).toEqual(jasmine.any(Object));
         });
 
         it('errors if multiple components are exported', () => {
@@ -408,7 +408,7 @@ describe('findExportedComponentDefinition', () => {
             export let ComponentB = R.createClass({});
           `;
 
-          expect(parse(source)).toBeDefined();
+          expect(parse(source)).toEqual(jasmine.any(Object));
         });
 
       });
@@ -422,7 +422,7 @@ describe('findExportedComponentDefinition', () => {
               Component = class extends React.Component {};
           `;
           var result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ClassExpression');
 
           source = `
@@ -431,7 +431,7 @@ describe('findExportedComponentDefinition', () => {
               somethingElse = 42;
           `;
           result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ClassExpression');
 
           source = `
@@ -441,7 +441,7 @@ describe('findExportedComponentDefinition', () => {
               somethingElse = 42;
           `;
           result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ClassExpression');
 
           source = `
@@ -450,7 +450,7 @@ describe('findExportedComponentDefinition', () => {
             export let Component  = class extends React.Component {};
           `;
           result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ClassExpression');
         });
 
@@ -478,7 +478,7 @@ describe('findExportedComponentDefinition', () => {
             export var ComponentB = class extends React.Component {};
           `;
           var result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ClassExpression');
         });
       });
@@ -492,7 +492,7 @@ describe('findExportedComponentDefinition', () => {
               Component = () => <div />;
           `;
           var result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ArrowFunctionExpression');
 
           source = `
@@ -501,7 +501,7 @@ describe('findExportedComponentDefinition', () => {
               somethingElse = 42;
           `;
           result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ArrowFunctionExpression');
 
           source = `
@@ -511,7 +511,7 @@ describe('findExportedComponentDefinition', () => {
               somethingElse = 42;
           `;
           result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ArrowFunctionExpression');
 
           source = `
@@ -520,7 +520,7 @@ describe('findExportedComponentDefinition', () => {
             export let Component = () => <div />
           `;
           result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ArrowFunctionExpression');
         });
 
@@ -548,7 +548,7 @@ describe('findExportedComponentDefinition', () => {
             export var ComponentB = function() { return <div />; };
           `;
           var result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('FunctionExpression');
         });
       });
@@ -565,7 +565,7 @@ describe('findExportedComponentDefinition', () => {
             var Component = React.createClass({});
             export {foo, Component}
           `;
-          expect(parse(source)).toBeDefined();
+          expect(parse(source)).toEqual(jasmine.any(Object));
 
           source = `
             import React from "React"
@@ -573,7 +573,7 @@ describe('findExportedComponentDefinition', () => {
             var Component = React.createClass({});
             export {Component, foo}
           `;
-          expect(parse(source)).toBeDefined();
+          expect(parse(source)).toEqual(jasmine.any(Object));
 
           source = `
             import React, { createElement } from "React"
@@ -582,7 +582,7 @@ describe('findExportedComponentDefinition', () => {
             var Component = React.createClass({});
             export {foo, Component as bar, baz}
           `;
-          expect(parse(source)).toBeDefined();
+          expect(parse(source)).toEqual(jasmine.any(Object));
         });
 
         it('errors if multiple components are exported', () => {
@@ -604,7 +604,7 @@ describe('findExportedComponentDefinition', () => {
             export {ComponentA}
           `;
 
-          expect(parse(source)).toBeDefined();
+          expect(parse(source)).toEqual(jasmine.any(Object));
         });
 
       });
@@ -619,7 +619,7 @@ describe('findExportedComponentDefinition', () => {
             export {foo, Component};
           `;
           var result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ClassExpression');
 
           source = `
@@ -629,7 +629,7 @@ describe('findExportedComponentDefinition', () => {
             export {Component, foo};
           `;
           result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ClassExpression');
 
           source = `
@@ -640,7 +640,7 @@ describe('findExportedComponentDefinition', () => {
             export {foo, Component as bar, baz};
           `;
           result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ClassExpression');
         });
 
@@ -663,7 +663,7 @@ describe('findExportedComponentDefinition', () => {
             export {ComponentA};
           `;
           var result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ClassExpression');
         });
 
@@ -679,7 +679,7 @@ describe('findExportedComponentDefinition', () => {
             export {foo, Component};
           `;
           var result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('FunctionDeclaration');
 
           source = `
@@ -689,7 +689,7 @@ describe('findExportedComponentDefinition', () => {
             export {Component, foo};
           `;
           result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ArrowFunctionExpression');
 
           source = `
@@ -700,7 +700,7 @@ describe('findExportedComponentDefinition', () => {
             export {foo, Component as bar, baz};
           `;
           result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('FunctionExpression');
         });
 
@@ -723,7 +723,7 @@ describe('findExportedComponentDefinition', () => {
             export {ComponentA};
           `;
           var result = parse(source);
-          expect(result).toBeDefined();
+          expect(result).toEqual(jasmine.any(Object));
           expect(result.node.type).toBe('ArrowFunctionExpression');
         });
 
@@ -740,7 +740,7 @@ describe('findExportedComponentDefinition', () => {
           export class Component extends React.Component {};
         `;
         var result = parse(source);
-        expect(result).toBeDefined();
+        expect(result).toEqual(jasmine.any(Object));
         expect(result.node.type).toBe('ClassDeclaration');
       });
 
@@ -761,7 +761,7 @@ describe('findExportedComponentDefinition', () => {
           export class ComponentB extends React.Component {};
         `;
         var result = parse(source);
-        expect(result).toBeDefined();
+        expect(result).toEqual(jasmine.any(Object));
         expect(result.node.type).toBe('ClassDeclaration');
       });
 
