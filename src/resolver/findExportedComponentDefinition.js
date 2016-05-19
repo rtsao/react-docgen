@@ -33,13 +33,24 @@ function isComponentDefinition(path) {
 }
 
 function isComponentOrHigherOrderComponent(path) {
-  return isComponentDefinition(path) || isHigherOrderComponent(path);
+  // Resolve the value of the right hand side. It should resolve to a call
+  // expression, something like React.createClass
+  path = resolveToValue(path.get('right'));
+  if (isComponentDefinition(path)) {
+    return path;
+  }
+  var componentPath = higherOrderComponent(path);
+  if (componentPath) {
+    return componentPath;
+  }
 }
 
-function isHigherOrderComponent(path) {
+function higherOrderComponent(path) {
   if (types.CallExpression.check(path.node)) {
     var resolvedPath = resolveToValue(path.get('arguments', 0));
-    return isComponentDefinition(resolvedPath);
+    if (isComponentDefinition(resolvedPath)) {
+      return resolvedPath;
+    }
   }
   return false;
 }
@@ -121,17 +132,15 @@ export default function findExportedComponentDefinition(
       if (!isExportsOrModuleAssignment(path)) {
         return false;
       }
-      // Resolve the value of the right hand side. It should resolve to a call
-      // expression, something like React.createClass
-      path = resolveToValue(path.get('right'));
-      if (!isComponentOrHigherOrderComponent(path)) {
+      var componentPath = isComponentOrHigherOrderComponent(path);
+      if (!componentPath) {
         return false;
       }
       if (definition) {
         // If a file exports multiple components, ... complain!
         throw new Error(ERROR_MULTIPLE_DEFINITIONS);
       }
-      definition = resolveDefinition(path, types);
+      definition = resolveDefinition(componentPath, types);
       return false;
     },
   });
